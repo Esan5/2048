@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "game.cpp"
+#include "../headers/game.hpp"
 
 int main() {
   std::vector<std::vector<int> > board = {{2, 2, 2, 2}, {1, 2, 3, 4}, {4, 3, 2, 1}, {1, 1, 1, 1}};
