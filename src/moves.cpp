@@ -12,7 +12,10 @@ uint64_t moves::moveUp(uint64_t board) {
  * Makes a left movement on the board.
  */
 uint64_t moves::moveLeft(uint64_t board) {
-  return board;
+  return (uint64_t) moves::condenseRow((board & game::row_1) >> 48) << 48 |
+         (uint64_t) moves::condenseRow((board & game::row_2) >> 32) << 32 |
+                    moves::condenseRow((board & game::row_3) >> 16) << 16 |
+                    moves::condenseRow((board & game::row_4));
 }
 
 /**
@@ -38,8 +41,15 @@ uint16_t moves::condenseRow(uint16_t row) {
     row = row << 4;
   }
 
+  while (!(row & 0x0F00) && (row & 0x00FF)) {
+    row = (row & 0xF000) | ((row & 0x00FF) << 4);
+  }
+
+  if (!(row & 0x00F0))
+    row = (row & 0xFF00) | ((row & 0x000F) << 4);
+
   if ((row & 0xF000) == ((row & 0x0F00) << 4)) {
-    result |= (row & 0xF000) << 1;
+    result |= (row & 0xF000) + 0x1000;
 
     if ((row & 0x00F0) == ((row & 0x000F) << 4)) {
       result |= (row & 0x00F0) << 5;
@@ -48,7 +58,11 @@ uint16_t moves::condenseRow(uint16_t row) {
     }
 
   } else if ((row & 0x0F00) == ((row & 0x00F0) << 4)) {
-    result |= (row & 0xFF00) << 1;
+    result |= (row & 0xF000) | ((row & 0x0F00) + 0x0100) | ((row & 0x000F) << 4);
+  } else if ((row & 0x00F0) == ((row & 0x000F) << 4)) {
+    result |= (row & 0xFF00) | ((row & 0x00F0) + 0x0010);
+  } else {
+    result = row;
   }
 
   return result;
