@@ -43,3 +43,7 @@ uint64_t bitboard::flipDiagonal(uint64_t board) {
 uint64_t bitboard::rotate(uint64_t board) {
   return bitboard::flipDiagonal(bitboard::flipVertical(board));
 }
+
+uint64_t bitboard::counterRotate(uint64_t board) {
+  return bitboard::flipVertical(bitboard::flipDiagonal(board));
+}

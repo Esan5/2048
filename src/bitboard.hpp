@@ -20,5 +20,6 @@ namespace bitboard {
   uint64_t flipDiagonal(uint64_t board);
 
   uint64_t rotate(uint64_t board);
+  uint64_t counterRotate(uint64_t board);
 
 }  // namespace bitboard
