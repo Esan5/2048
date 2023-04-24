@@ -16,6 +16,7 @@ add_library(bitboard STATIC src/bitboard.cpp src/bitboard.hpp)
 target_link_libraries(moves PUBLIC bitboard)
 
 target_link_libraries(game PUBLIC bitboard)
+target_link_libraries(game PUBLIC moves)
 
 target_link_libraries(main PUBLIC game)
 target_link_libraries(main PUBLIC moves)
