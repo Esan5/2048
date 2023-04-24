@@ -1,3 +1,6 @@
+#ifndef MOVES_HPP
+#define MOVES_HPP
+
 #include <cstdint>
 
 namespace moves {
@@ -8,3 +11,5 @@ namespace moves {
   uint64_t moveRight(uint64_t board);
   uint64_t moveLeft(uint64_t board);
 };  // namespace moves
+
+#endif

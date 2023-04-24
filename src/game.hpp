@@ -1,3 +1,6 @@
+#ifndef GAME_HPP
+#define GAME_HPP
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -9,3 +12,5 @@ namespace game {
 
   std::string to_string(uint64_t board);
 }  // namespace game
+
+#endif

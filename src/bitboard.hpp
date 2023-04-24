@@ -1,5 +1,7 @@
-#include <cstdint>
+#ifndef BITBOARD_HPP
+#define BITBOARD_HPP
 
+#include <cstdint>
 
 namespace bitboard {
   static constexpr uint64_t row_1{0xFFFF000000000000};
@@ -23,3 +25,5 @@ namespace bitboard {
   uint64_t counterRotate(uint64_t board);
 
 }  // namespace bitboard
+
+#endif
