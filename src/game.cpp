@@ -1,5 +1,6 @@
 #include "game.hpp"
 #include "bitboard.hpp"
+#include "moves.hpp"
 
 #include <iomanip>
 #include <iostream>
@@ -26,7 +27,10 @@ uint64_t game::getBoard(std::vector<std::vector<int> > board) {
  * Returns true if there are no more legal moves.
  */
 bool game::gameOver(uint64_t board) {
-  return true;
+  return (board == moves::moveLeft(board))  &&
+         (board == moves::moveRight(board)) &&
+         (board == moves::moveUp(board))    &&
+         (board == moves::moveDown(board));
 }
 
 /**
