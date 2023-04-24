@@ -1,15 +1,14 @@
 #include "bitboard.hpp"
-#include "game.hpp"
 
 /**
  * Flips the board vertically such that row 1 becomes row 4, row 2 becomes row 3, and vice versa.
  * This takes eleven operations.
  */
 uint64_t bitboard::flipVertical(uint64_t board) {
-  return ((board & game::row_1) >> 48) |
-         ((board & game::row_2) >> 16) |
-         ((board & game::row_3) << 16) |
-         ((board & game::row_4) << 48);
+  return ((board & bitboard::row_1) >> 48) |
+         ((board & bitboard::row_2) >> 16) |
+         ((board & bitboard::row_3) << 16) |
+         ((board & bitboard::row_4) << 48);
 }
 
 /**
@@ -17,10 +16,10 @@ uint64_t bitboard::flipVertical(uint64_t board) {
  * This takes eleven operations.
  */
 uint64_t bitboard::flipHorizontal(uint64_t board) {
-  return ((board & game::col_1) >> 12) |
-         ((board & game::col_2) >> 4) |
-         ((board & game::col_3) << 4) |
-         ((board & game::col_4) << 12);
+  return ((board & bitboard::col_1) >> 12) |
+         ((board & bitboard::col_2) >> 4) |
+         ((board & bitboard::col_3) << 4) |
+         ((board & bitboard::col_4) << 12);
 }
 
 /**

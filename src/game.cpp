@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "bitboard.hpp"
 
 #include <iomanip>
 #include <iostream>
@@ -34,10 +35,10 @@ bool game::gameOver(uint64_t board) {
 std::string game::to_string(uint64_t board) {
   std::stringstream stream;
 
-  stream << std::setw(4) << std::setfill('0') << std::hex << ((board & game::row_1) >> 48) << '\n';
-  stream << std::setw(4) << std::setfill('0') << std::hex << ((board & game::row_2) >> 32) << '\n';
-  stream << std::setw(4) << std::setfill('0') << std::hex << ((board & game::row_3) >> 16) << '\n';
-  stream << std::setw(4) << std::setfill('0') << std::hex << (board & game::row_4);
+  stream << std::setw(4) << std::setfill('0') << std::hex << ((board & bitboard::row_1) >> 48) << '\n';
+  stream << std::setw(4) << std::setfill('0') << std::hex << ((board & bitboard::row_2) >> 32) << '\n';
+  stream << std::setw(4) << std::setfill('0') << std::hex << ((board & bitboard::row_3) >> 16) << '\n';
+  stream << std::setw(4) << std::setfill('0') << std::hex << (board & bitboard::row_4);
 
   return stream.str();
 }
