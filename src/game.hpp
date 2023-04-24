@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-class game {
+namespace game {
   static constexpr uint64_t row_1{0xFFFF000000000000};
   static constexpr uint64_t row_2{0x0000FFFF00000000};
   static constexpr uint64_t row_3{0x00000000FFFF0000};
@@ -15,30 +15,9 @@ class game {
 
   static constexpr uint64_t full{0xFFFFFFFFFFFFFFFF};
 
- private:
-  uint64_t board;
+  uint64_t getBoard(std::vector< std::vector< int > > board);
 
-  uint64_t condenseRow(uint64_t row);
+  bool gameOver(uint64_t board);
 
- public:
-  game();
-  explicit game(std::vector<std::vector<int> > board);
-  explicit game(uint64_t board);
-  ~game();
-
-  uint64_t getBoard();
-
-  void moveDown();
-  void moveUp();
-  void moveRight();
-  void moveLeft();
-
-  void flipVertical();
-  void flipHorizontal();
-  void flipDiagonal();
-  void rotate();
-
-  bool gameOver();
-
-  std::string to_string();
-};
+  std::string to_string(uint64_t board);
+}  // namespace game
