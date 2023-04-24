@@ -4,7 +4,7 @@ project(2048
         VERSION 1.0
         DESCRIPTION "A simple 2048 game with bots to play it."
         LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_executable(main src/main.cpp)
