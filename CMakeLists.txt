@@ -12,7 +12,7 @@ add_executable(main src/main.cpp)
 add_library(moves STATIC src/moves.cpp src/moves.hpp)
 add_library(game STATIC src/game.cpp src/game.hpp)
 add_library(bitboard STATIC src/bitboard.cpp src/bitboard.hpp)
-add_library(agent STATIC src/agent.cpp src/agent.hpp)
+add_library(monte_carlo STATIC src/monte_carlo.cpp src/monte_carlo.hpp)
 
 target_link_libraries(moves PUBLIC bitboard)
 
@@ -22,3 +22,4 @@ target_link_libraries(game PUBLIC moves)
 target_link_libraries(main PUBLIC game)
 target_link_libraries(main PUBLIC moves)
 target_link_libraries(main PUBLIC bitboard)
+target_link_libraries(main PUBLIC monte_carlo)
