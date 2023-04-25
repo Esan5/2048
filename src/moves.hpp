@@ -17,6 +17,8 @@ namespace moves {
     RIGHT
   };
 
+  uint64_t move(uint64_t board, moves::type type);
+
   /**
   * Condenses a row towards the left.
   */
