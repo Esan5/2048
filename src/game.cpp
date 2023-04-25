@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <random>
 
 /**
  * Construct a game board from an input board.
@@ -31,6 +32,81 @@ bool game::gameOver(uint64_t board) {
          (board == moves::moveRight(board)) &&
          (board == moves::moveUp(board))    &&
          (board == moves::moveDown(board));
+}
+
+/**
+ * Returns a uint64_t with F for currently open spaces.
+ */
+uint64_t game::openSpaces(uint64_t board) {
+  board |= (board >> 1) & (0x7777777777777777);
+  board |= (board << 1) & (0xEEEEEEEEEEEEEEEE);
+
+  board |= (board >> 2) & (0x3333333333333333);
+  board |= (board << 2) & (0xCCCCCCCCCCCCCCCC);
+  return board ^ bitboard::full;
+}
+
+/**
+ * Returns the number of filled tiles on the board. Can be used with game::openSpaces to find the number of open tiles on the board.
+ */
+uint8_t game::countTiles(uint64_t board) {
+  uint8_t result = 0;
+
+  while(board) {
+    if (board & 0xF) {
+      result = result + 1;
+    }
+    board = board >> 4;
+  }
+
+  return result;
+}
+
+/**
+ * Add a new tile to the board based on the rules of 2048.
+ */
+uint64_t game::populateBoard(uint64_t board) {
+  uint64_t open = game::openSpaces(board);
+
+  // If the board doesn't have any open spaces, just return
+  if (!open)
+    return board;
+
+  // Get the number of open spaces
+  uint8_t numSpaces = game::countTiles(open);
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  // Determine the location of the new tile
+  std::uniform_int_distribution<> place(1, numSpaces);
+
+  // Determine the value of the new tile
+  std::uniform_int_distribution<> value(0, 9);
+
+  uint8_t toFill = place(gen);
+
+  // 10% of the time should be 4, 90% of the time should be 2
+  uint64_t newTile = value(gen) ? 0x1 : 0x2;
+
+  for (;;) {
+    while (!(open & 0xF)) {
+      open = open >> 4;
+      newTile = newTile << 4;
+    }
+
+    // We have found an open position in the board
+    toFill--;
+
+    // We are at the correct index
+    if (!toFill) {
+      return board | newTile;
+    }
+
+    // We need to shift again for this index
+    open = open >> 4;
+    newTile = newTile << 4;
+  }
 }
 
 /**
