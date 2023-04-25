@@ -10,6 +10,13 @@ namespace moves {
   uint64_t moveRight(uint64_t board);
   uint64_t moveLeft(uint64_t board);
 
+  enum type {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+  };
+
   /**
   * Condenses a row towards the left.
   */
