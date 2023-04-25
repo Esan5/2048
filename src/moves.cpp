@@ -34,3 +34,18 @@ uint64_t moves::moveUp(uint64_t board) {
 uint64_t moves::moveDown(uint64_t board) {
   return bitboard::counterRotate(moves::moveLeft(bitboard::rotate(board)));
 }
+
+uint64_t moves::move(uint64_t board, moves::type move) {
+  switch (move) {
+    case moves::type::UP:
+      return moves::moveUp(board);
+    case moves::type::DOWN:
+      return moves::moveDown(board);
+    case moves::type::LEFT:
+      return moves::moveLeft(board);
+    case moves::type::RIGHT:
+      return moves::moveRight(board);
+    default:
+      return board;
+  }
+}

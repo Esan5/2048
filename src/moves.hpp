@@ -14,7 +14,8 @@ namespace moves {
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT,
+    NONE
   };
 
   uint64_t move(uint64_t board, moves::type type);
