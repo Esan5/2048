@@ -1,6 +1,7 @@
 #include "game.hpp"
 #include "bitboard.hpp"
 #include "moves.hpp"
+#include "eval.hpp"
 
 #include <iomanip>
 #include <iostream>
@@ -49,13 +50,24 @@ uint64_t game::openSpaces(uint64_t board) {
 /**
  * Returns the number of filled tiles on the board. Can be used with game::openSpaces to find the number of open tiles on the board.
  */
-uint8_t game::countTiles(uint64_t board) {
+constexpr uint8_t game::countTiles(uint64_t board) {
+  return (4 - eval::zeroesTable[(board & bitboard::row_1) >> 48]) +
+         (4 - eval::zeroesTable[(board & bitboard::row_2) >> 32]) +
+         (4 - eval::zeroesTable[(board & bitboard::row_3) >> 16]) +
+         (4 - eval::zeroesTable[(board & bitboard::row_4)]);
+}
+
+/**
+ * Returns the maximum value tile on a board.
+ */
+uint8_t game::maxTile(uint64_t board) {
+  if (!board) return 0;
+
   uint8_t result = 0;
 
-  while(board) {
-    if (board & 0xF) {
-      result = result + 1;
-    }
+  while (board) {
+    if ((board & 0xF) > result)
+      result = board & 0xF;
     board = board >> 4;
   }
 
