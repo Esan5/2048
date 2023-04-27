@@ -82,7 +82,7 @@ moves::type MonteCarlo::bestMove(uint64_t board) {
   uint32_t right_score = right_future.valid() ? right_future.get() : 0;
   uint32_t up_score = up_future.valid() ? up_future.get() : 0;
   uint32_t down_score = down_future.valid() ? down_future.get() : 0;
-
+  
   moves::type ret = moves::type::LEFT;
   uint64_t best_score = left_score;
 
@@ -99,8 +99,6 @@ moves::type MonteCarlo::bestMove(uint64_t board) {
     ret = moves::type::DOWN;
     best_score = down_score;
   }
-
-  std::cout << static_cast<double>(best_score) / MonteCarlo::NUM_TRIALS << "\n\n";
 
   return ret;
 }

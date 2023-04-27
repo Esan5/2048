@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "bitboard.hpp"
 
 /**
@@ -46,4 +48,21 @@ uint64_t bitboard::rotate(uint64_t board) {
 
 uint64_t bitboard::counterRotate(uint64_t board) {
   return bitboard::flipVertical(bitboard::flipDiagonal(board));
+}
+
+std::vector<uint64_t> bitboard::allFlips(uint64_t board) {
+  std::vector<uint64_t> result {};
+  result.push_back(board);
+  uint64_t rotated = bitboard::rotate(board);
+  result.push_back(rotated);
+  result.push_back(bitboard::rotate(board));
+  result.push_back(bitboard::counterRotate(board));
+  board = bitboard::flipHorizontal(board);
+  result.push_back(board);
+  rotated = bitboard::rotate(board);
+  result.push_back(rotated);
+  result.push_back(bitboard::rotate(rotated));
+  result.push_back(bitboard::counterRotate(board));
+
+  return result;
 }

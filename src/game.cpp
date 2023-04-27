@@ -50,11 +50,11 @@ uint64_t game::openSpaces(uint64_t board) {
 /**
  * Returns the number of filled tiles on the board. Can be used with game::openSpaces to find the number of open tiles on the board.
  */
-constexpr uint8_t game::countTiles(uint64_t board) {
-  return (4 - eval::zeroesTable[(board & bitboard::row_1) >> 48]) +
-         (4 - eval::zeroesTable[(board & bitboard::row_2) >> 32]) +
-         (4 - eval::zeroesTable[(board & bitboard::row_3) >> 16]) +
-         (4 - eval::zeroesTable[(board & bitboard::row_4)]);
+uint8_t game::countTiles(uint64_t board) {
+  return (4 - eval::zerosTable[(board & bitboard::row_1) >> 48]) +
+         (4 - eval::zerosTable[(board & bitboard::row_2) >> 32]) +
+         (4 - eval::zerosTable[(board & bitboard::row_3) >> 16]) +
+         (4 - eval::zerosTable[(board & bitboard::row_4)]);
 }
 
 /**

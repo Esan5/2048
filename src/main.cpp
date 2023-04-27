@@ -1,16 +1,32 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
+#include "monte_carlo.hpp"
 #include "game.hpp"
 #include "bitboard.hpp"
 #include "moves.hpp"
+#include "expectiminimax.hpp"
+#include "eval.hpp"
 
 int main() {
-  std::vector<std::vector<int> > test = {{2, 2, 2, 2}, {1, 2, 3, 4}, {4, 3, 2, 1}, {1, 1, 1, 1}};
+  uint64_t board = game::populateBoard(game::populateBoard(0));
 
-  uint64_t board = game::getBoard(test);
-  std::cout << game::to_string(board) << '\n' << '\n';
+  std::unordered_map<uint64_t, float> table;
 
-  board = moves::moveRight(board);
-  std::cout << game::to_string(board) << '\n' << '\n';
+  while (!game::gameOver(board)) {
+    moves::type best_move = exp::bestMove(board);
+
+    board = game::populateBoard(moves::move(board, best_move));
+    std::cout << game::to_string(board) << "\n\n";
+  }
+
+  uint32_t score {0};
+
+  score = score + eval::scoreTable[(board & bitboard::row_1) >> 48];
+  score = score + eval::scoreTable[(board & bitboard::row_2) >> 32];
+  score = score + eval::scoreTable[(board & bitboard::row_3) >> 16];
+  score = score + eval::scoreTable[(board & bitboard::row_4)];
+
+  std::cout << static_cast<int>(score) << "\n";
 }

@@ -12,7 +12,7 @@ namespace game {
 
   uint64_t openSpaces(uint64_t board);
 
-  constexpr uint8_t countTiles(uint64_t board);
+  uint8_t countTiles(uint64_t board);
 
   uint8_t maxTile(uint64_t board);
 
