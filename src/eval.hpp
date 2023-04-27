@@ -8,10 +8,10 @@
 
 
 namespace eval {
-  constexpr float MONOTONICITY_MULTIPLIER = 0.0f;
+  constexpr float MONOTONICITY_MULTIPLIER = 10.0f;
   constexpr float ZEROS_MULTIPLIER = 3.0f;
   constexpr float SCORE_MULTIPLIER = 0.0f;
-  constexpr float MERGE_MULTIPLIER = 1.0f;
+  constexpr float MERGE_MULTIPLIER = 0.0f;
   constexpr float EDGE_MULTIPLIER = 0.0f;
 }  // namespace eval
 
@@ -38,7 +38,7 @@ namespace eval {
   } ();
 
   constexpr uint32_t evalMonotonicity(uint64_t board) {
-    uint64_t transpose = bitboard::rotate(board);
+    uint64_t transpose = bitboard::flipDiagonal(board);
     return  monotoneTable[((board & bitboard::row_1) >> 48)] +
             monotoneTable[((board & bitboard::row_2) >> 32)] +
             monotoneTable[((board & bitboard::row_3) >> 16)] +
@@ -97,9 +97,9 @@ namespace eval {
   }
 
   constexpr uint8_t evalMergesRow(uint16_t row) {
-    return (!(((row & 0xF000) >> 4) ^ (row & 0x0F00)) ? 1 : 0) +
-           (!(((row & 0x0F00) >> 4) ^ (row & 0x00F0)) ? 1 : 0) +
-           (!(((row & 0x00F0) >> 4) ^ (row & 0x000F)) ? 1 : 0);
+    return ((((row & 0xF000) >> 4) ^ (row & 0x0F00)) ? 0 : 1) +
+           ((((row & 0x0F00) >> 4) ^ (row & 0x00F0)) ? 0 : 1) +
+           ((((row & 0x00F0) >> 4) ^ (row & 0x000F)) ? 0 : 1);
   }
 
   constexpr std::array<uint8_t, 0xFFFF> mergeTable = [] {
@@ -110,7 +110,7 @@ namespace eval {
   } ();
 
   constexpr uint32_t evalMerges(uint64_t board) {
-    uint64_t transpose = bitboard::rotate(board);
+    uint64_t transpose = bitboard::flipDiagonal(board);
     return  mergeTable[((board & bitboard::row_1) >> 48)] +
             mergeTable[((board & bitboard::row_2) >> 32)] +
             mergeTable[((board & bitboard::row_3) >> 16)] +
@@ -133,7 +133,7 @@ namespace eval {
   } ();
 
   constexpr uint32_t evalEdges(uint64_t board) {
-    uint64_t transpose = bitboard::rotate(board);
+    uint64_t transpose = bitboard::flipDiagonal(board);
 
     return  edgeTable[((board & bitboard::row_1) >> 48)] +
             edgeTable[((board & bitboard::row_2) >> 32)] +
@@ -148,13 +148,13 @@ namespace eval {
   constexpr std::array<float, 0xFFFF> heuristicTable = [] {
     std::array<float , 0xFFFF> result {};
     for (uint16_t i = 0; i < 0xFFFF; i++) {
-      result[i] = monotoneTable[i] * MONOTONICITY_MULTIPLIER + zerosTable[i] * ZEROS_MULTIPLIER + mergeTable[i] * MERGE_MULTIPLIER;
+      result[i] = monotoneTable[i] * MONOTONICITY_MULTIPLIER + zerosTable[i] * ZEROS_MULTIPLIER + edgeTable[i] * EDGE_MULTIPLIER;
     }
     return result;
   } ();
 
   constexpr float applyHeuristic(uint64_t board) {
-    uint64_t transpose = bitboard::rotate(board);
+    uint64_t transpose = bitboard::flipDiagonal(board);
 
     return  heuristicTable[((board & bitboard::row_1) >> 48)] +
             heuristicTable[((board & bitboard::row_2) >> 32)] +

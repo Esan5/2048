@@ -25,14 +25,14 @@ uint64_t moves::moveRight(uint64_t board) {
  * Makes an up movement on the board.
  */
 uint64_t moves::moveUp(uint64_t board) {
-  return bitboard::counterRotate(moves::moveRight(bitboard::rotate(board)));
+  return bitboard::flipDiagonal(moves::moveLeft(bitboard::flipDiagonal(board)));
 }
 
 /**
  * Makes a down movement on the board.
  */
 uint64_t moves::moveDown(uint64_t board) {
-  return bitboard::counterRotate(moves::moveLeft(bitboard::rotate(board)));
+  return bitboard::flipDiagonal(moves::moveRight(bitboard::flipDiagonal(board)));
 }
 
 uint64_t moves::move(uint64_t board, moves::type move) {

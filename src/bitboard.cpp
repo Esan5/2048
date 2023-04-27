@@ -53,16 +53,16 @@ uint64_t bitboard::counterRotate(uint64_t board) {
 std::vector<uint64_t> bitboard::allFlips(uint64_t board) {
   std::vector<uint64_t> result {};
   result.push_back(board);
-  uint64_t rotated = bitboard::rotate(board);
-  result.push_back(rotated);
-  result.push_back(bitboard::rotate(board));
-  result.push_back(bitboard::counterRotate(board));
-  board = bitboard::flipHorizontal(board);
-  result.push_back(board);
-  rotated = bitboard::rotate(board);
-  result.push_back(rotated);
-  result.push_back(bitboard::rotate(rotated));
-  result.push_back(bitboard::counterRotate(board));
+  uint64_t transposition = bitboard::flipHorizontal(board);
+  result.push_back(transposition);
+  uint64_t diag_board = bitboard::flipDiagonal(board);
+  uint64_t diag_trans = bitboard::flipDiagonal(transposition);
+  result.push_back(bitboard::flipDiagonal(board));
+  result.push_back(bitboard::flipDiagonal(transposition));
+  result.push_back(bitboard::flipVertical(board));
+  result.push_back(bitboard::flipVertical(transposition));
+  result.push_back(bitboard::flipHorizontal(diag_board));
+  result.push_back(bitboard::flipHorizontal(diag_trans));
 
   return result;
 }
