@@ -12,8 +12,6 @@
 int main() {
   uint64_t board = game::populateBoard(game::populateBoard(0));
 
-  std::unordered_map<uint64_t, float> table;
-
   while (!game::gameOver(board)) {
     moves::type best_move = exp::bestMove(board);
 

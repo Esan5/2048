@@ -36,15 +36,12 @@ bool game::gameOver(uint64_t board) {
 }
 
 /**
- * Returns a uint64_t with F for currently open spaces.
+ * Returns a uint64_t with 1 for currently open spaces.
  */
 uint64_t game::openSpaces(uint64_t board) {
-  board |= (board >> 1) & (0x7777777777777777);
-  board |= (board << 1) & (0xEEEEEEEEEEEEEEEE);
-
   board |= (board >> 2) & (0x3333333333333333);
-  board |= (board << 2) & (0xCCCCCCCCCCCCCCCC);
-  return board ^ bitboard::full;
+  board |= (board >> 1);
+  return ~board & 0x1111111111111111;
 }
 
 /**
@@ -99,7 +96,7 @@ uint64_t game::populateBoard(uint64_t board) {
   uint8_t toFill = place(gen);
 
   // 10% of the time should be 4, 90% of the time should be 2
-  uint64_t newTile = value(gen) ? 0x1 : 0x2;
+  uint64_t newTile = value(gen) ? 1 : 2;
 
   for (;;) {
     while (!(open & 0xF)) {

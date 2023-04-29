@@ -8,11 +8,11 @@
 
 
 namespace eval {
-  constexpr float MONOTONICITY_MULTIPLIER = 10.0f;
-  constexpr float ZEROS_MULTIPLIER = 3.0f;
+  constexpr float MONOTONICITY_MULTIPLIER = 50.0f;
+  constexpr float ZEROS_MULTIPLIER = 1.0f;
   constexpr float SCORE_MULTIPLIER = 0.0f;
-  constexpr float MERGE_MULTIPLIER = 0.0f;
-  constexpr float EDGE_MULTIPLIER = 0.0f;
+  constexpr float MERGE_MULTIPLIER = 1.0f;
+  constexpr float EDGE_MULTIPLIER = 1.0f;
 }  // namespace eval
 
 namespace eval {
@@ -50,10 +50,10 @@ namespace eval {
   }
 
   constexpr uint8_t evalZerosRow(uint16_t row) {
-    return (!(row & 0xF000) ? 1 : 0) +
-           (!(row & 0x0F00) ? 1 : 0) +
-           (!(row & 0x00F0) ? 1 : 0) +
-           (!(row & 0x000F) ? 1 : 0);
+    return ((row & 0xF000) ? 0 : 1) +
+           ((row & 0x0F00) ? 0 : 1) +
+           ((row & 0x00F0) ? 0 : 1) +
+           ((row & 0x000F) ? 0 : 1);
   }
 
   constexpr std::array<uint8_t, 0xFFFF> zerosTable = [] {
@@ -102,6 +102,7 @@ namespace eval {
            ((((row & 0x00F0) >> 4) ^ (row & 0x000F)) ? 0 : 1);
   }
 
+  /**
   constexpr std::array<uint8_t, 0xFFFF> mergeTable = [] {
     std::array<uint8_t, 0xFFFF> result {};
     for (uint16_t i = 0; i < 0xFFFF; i++)
@@ -120,6 +121,7 @@ namespace eval {
             mergeTable[((transpose & bitboard::row_3) >> 16)] +
             mergeTable[((transpose & bitboard::row_4))];
   }
+  */
 
   constexpr uint32_t evalEdgesRow(uint16_t row) {
     return (2 << ((row & 0xF000) >> 12)) + (2 << (row & 0xF));
@@ -148,7 +150,7 @@ namespace eval {
   constexpr std::array<float, 0xFFFF> heuristicTable = [] {
     std::array<float , 0xFFFF> result {};
     for (uint16_t i = 0; i < 0xFFFF; i++) {
-      result[i] = monotoneTable[i] * MONOTONICITY_MULTIPLIER + zerosTable[i] * ZEROS_MULTIPLIER + edgeTable[i] * EDGE_MULTIPLIER;
+      result[i] = monotoneTable[i] * MONOTONICITY_MULTIPLIER + zerosTable[i] * ZEROS_MULTIPLIER + edgeTable[i] * EDGE_MULTIPLIER + evalMergesRow(i) * MERGE_MULTIPLIER;
     }
     return result;
   } ();
