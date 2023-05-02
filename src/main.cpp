@@ -5,8 +5,10 @@
 #include <future>
 
 #include "hyperparameter.hpp"
+#include "expectiminimax.hpp"
+#include "game.hpp"
 
-int main() {
+void train_hypers() {
   const int num_trials = 8;
 
   float mono;
@@ -61,4 +63,16 @@ int main() {
 
     result = 0;
   }
+}
+
+int main() {
+
+  uint64_t board = game::populateBoard(game::populateBoard(0));
+
+  while (!game::gameOver(board)) {
+    board = moves::move(board, exp::bestMove(board));
+    board = game::populateBoard(board);
+    std::cout << game::to_string(board) << "\n\n";
+  }
+
 }

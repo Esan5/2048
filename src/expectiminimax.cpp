@@ -81,6 +81,9 @@ float exp::stateNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t,
 float exp::chanceNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability) {
   uint64_t open_spaces = game::openSpaces(board);
 
+  if (!(open_spaces))
+    return exp::stateNode(board, depth, table, probability);
+
   uint8_t num_children { game::countTiles(open_spaces) };
   float prob_two { 0.9f * (1.0f / num_children) };
   float prob_four { 0.1f * (1.0f / num_children) };
