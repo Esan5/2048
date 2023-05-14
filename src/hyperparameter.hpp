@@ -8,6 +8,13 @@
 
 namespace parameter {
 
+  typedef struct individual {
+    float mono;
+    float zero;
+    float edge;
+    float merge;
+  } individual;
+
   static float MONOTONICITY_MULTIPLIER;
   static float ZEROS_MULTIPLIER;
   static float EDGE_MULTIPLIER;
@@ -149,13 +156,15 @@ namespace parameter {
             edgeTable[((transpose & bitboard::row_4))];
   }
 
-  static void initializeTable();
+  static std::array<float, 0xFFFF> initializeTable(individual individual);
 
-  float applyHeuristic(uint64_t board);
+  float applyHeuristic(uint64_t board, const std::array<float, 0xFFFF> &eval_table);
 
-  uint32_t evaluateHueristics(float mono, float zero, float edge, float merge);
+  float evaluateIndividual(individual individual);
 
-  uint32_t playGame();
+  uint32_t evaluateHueristics(individual individual);
+
+  uint32_t playGame(const std::array<float, 0xFFFF> &eval_table);
 
 }  // namespace parameter
 

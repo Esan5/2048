@@ -1,5 +1,8 @@
 #include <algorithm>
 #include <unordered_map>
+#include <future>
+#include <iostream>
+#include <random>
 
 #include "hyperparameter.hpp"
 #include "game.hpp"
@@ -7,14 +10,14 @@
 #include "eval.hpp"
 
 namespace opt {
-  const uint8_t MAX_DEPTH {5};
+  const uint8_t MAX_DEPTH {6};
   const float PROB_THRESH {0.0001};
 
-  float stateNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability);
-  float chanceNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability);
+  float stateNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability, std::array<float, 0xFFFF> const &eval_table);
+  float chanceNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability, std::array<float, 0xFFFF> const &eval_table);
 
 
-  moves::type bestMove(uint64_t board) {
+  moves::type bestMove(uint64_t board, std::array<float, 0xFFFF> const &eval_table) {
     if (game::gameOver(board))
       return moves::type::NONE;
 
@@ -25,10 +28,10 @@ namespace opt {
     uint64_t down = moves::moveDown(board);
     uint64_t up = moves::moveUp(board);
 
-    float left_score = (left ^ board) ? stateNode(left, MAX_DEPTH, table, 1) : 0;
-    float right_score = (right ^ board) ? stateNode(right, MAX_DEPTH, table, 1) : 0;
-    float up_score = (up ^ board) ? stateNode(up, MAX_DEPTH, table, 1) : 0;
-    float down_score = (down ^ board) ? stateNode(down, MAX_DEPTH, table, 1) : 0;
+    float left_score = (left ^ board) ? stateNode(left, MAX_DEPTH, table, 1, eval_table) : 0;
+    float right_score = (right ^ board) ? stateNode(right, MAX_DEPTH, table, 1, eval_table) : 0;
+    float up_score = (up ^ board) ? stateNode(up, MAX_DEPTH, table, 1, eval_table) : 0;
+    float down_score = (down ^ board) ? stateNode(down, MAX_DEPTH, table, 1, eval_table) : 0;
 
     float best_score = up_score;
     moves::type best_move = moves::type::UP;
@@ -48,7 +51,7 @@ namespace opt {
     return best_move;
   }
 
-  float stateNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability) {
+  float stateNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability, std::array<float, 0xFFFF> const &eval_table) {
     auto found = table.find(board);
     if (found != table.end()) {
       return table[board];
@@ -58,17 +61,17 @@ namespace opt {
       return 0;
 
     if (!depth || probability < PROB_THRESH)
-      return parameter::applyHeuristic(board);
+      return parameter::applyHeuristic(board, eval_table);
 
     uint64_t left = moves::moveLeft(board);
     uint64_t right = moves::moveRight(board);
     uint64_t down = moves::moveDown(board);
     uint64_t up = moves::moveUp(board);
 
-    float left_score = (left ^ board) ? chanceNode(left, depth - 1, table, probability) : 0.f;
-    float right_score = (right ^ board) ? chanceNode(right, depth - 1, table, probability) : 0.f;
-    float up_score = (up ^ board) ? chanceNode(up, depth - 1, table, probability) : 0.f;
-    float down_score = (down ^ board) ? chanceNode(down, depth - 1, table, probability) : 0.f;
+    float left_score = (left ^ board) ? chanceNode(left, depth - 1, table, probability, eval_table) : 0.f;
+    float right_score = (right ^ board) ? chanceNode(right, depth - 1, table, probability, eval_table) : 0.f;
+    float up_score = (up ^ board) ? chanceNode(up, depth - 1, table, probability, eval_table) : 0.f;
+    float down_score = (down ^ board) ? chanceNode(down, depth - 1, table, probability, eval_table) : 0.f;
 
     float best_score = std::max(std::max(left_score, right_score), std::max(up_score, down_score));
 
@@ -78,7 +81,7 @@ namespace opt {
     return best_score;
   }
 
-  float chanceNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability) {
+  float chanceNode(uint64_t board, uint8_t depth, std::unordered_map<uint64_t, float> &table, float probability, std::array<float, 0xFFFF> const &eval_table) {
     uint64_t open_spaces = game::openSpaces(board);
 
     uint8_t num_children { game::countTiles(open_spaces) };
@@ -92,8 +95,8 @@ namespace opt {
 
     while (open_spaces) {
       if (open_spaces & 0xF) {
-        value += prob_two * (stateNode(board | new_two, depth, table, probability * prob_two));
-        value += prob_four * (stateNode(board | new_four, depth, table, probability * prob_four));
+        value += prob_two * (stateNode(board | new_two, depth, table, probability * prob_two, eval_table));
+        value += prob_four * (stateNode(board | new_four, depth, table, probability * prob_four, eval_table));
       }
       new_two = new_two << 4;
       new_four = new_four << 4;
@@ -105,44 +108,48 @@ namespace opt {
 }  // namespace opt
 
 namespace parameter {
-  static void initializeTable() {
+  std::array<float, 0xFFFF> initializeTable(individual in) {
+    std::array<float, 0xFFFF> result;
     for (uint16_t i = 0; i < 0xFFFF; i++) {
-      heuristicTable[i] = monotoneTable[i] * MONOTONICITY_MULTIPLIER + zerosTable[i] * ZEROS_MULTIPLIER + edgeTable[i] * EDGE_MULTIPLIER + evalMergesRow(i) * MERGE_MULTIPLIER;
+      result[i] = monotoneTable[i] * in.mono + zerosTable[i] * in.zero + edgeTable[i] * in.edge + evalMergesRow(i) * in.merge;
     }
+
+    return result;
   }
 
-  float applyHeuristic(uint64_t board) {
+  float applyHeuristic(uint64_t board, const std::array<float, 0xFFFF> &eval_table) {
     uint64_t transpose = bitboard::flipDiagonal(board);
 
-    return  heuristicTable[((board & bitboard::row_1) >> 48)] +
-            heuristicTable[((board & bitboard::row_2) >> 32)] +
-            heuristicTable[((board & bitboard::row_3) >> 16)] +
-            heuristicTable[((board & bitboard::row_4))]       +
-            heuristicTable[((transpose & bitboard::row_1) >> 48)] +
-            heuristicTable[((transpose & bitboard::row_2) >> 32)] +
-            heuristicTable[((transpose & bitboard::row_3) >> 16)] +
-            heuristicTable[((transpose & bitboard::row_4))];
+    return  eval_table[((board & bitboard::row_1) >> 48)] +
+            eval_table[((board & bitboard::row_2) >> 32)] +
+            eval_table[((board & bitboard::row_3) >> 16)] +
+            eval_table[((board & bitboard::row_4))]       +
+            eval_table[((transpose & bitboard::row_1) >> 48)] +
+            eval_table[((transpose & bitboard::row_2) >> 32)] +
+            eval_table[((transpose & bitboard::row_3) >> 16)] +
+            eval_table[((transpose & bitboard::row_4))];
   }
 
-  uint32_t evaluateHueristics(float mono, float zero, float edge, float merge) {
-    MONOTONICITY_MULTIPLIER = mono;
-    ZEROS_MULTIPLIER = zero;
-    EDGE_MULTIPLIER = edge;
-    MERGE_MULTIPLIER = merge;
+  uint32_t evaluateHueristics(individual individual) {
+    auto table = initializeTable(individual);
 
-    initializeTable();
-
-    return playGame();
+    return playGame(table);
   }
 
-  uint32_t playGame() {
+  uint32_t playGame(std::array<float, 0xFFFF> const &table) {
     uint64_t board = game::populateBoard(game::populateBoard(0));
 
     while (!game::gameOver(board)) {
-      board = game::populateBoard(moves::move(board, opt::bestMove(board)));
+      board = game::populateBoard(moves::move(board, opt::bestMove(board, table)));
     }
 
     return eval::evalScore(board);
+  }
+
+  float evaluateIndividual(individual individual) {
+    std::array<float, 0xFFFF> table = initializeTable(individual);
+
+    return static_cast<float>(playGame(table) + playGame(table)) / 2;
   }
 }  // namespace parameter
 
