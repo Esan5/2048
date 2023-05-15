@@ -1,6 +1,6 @@
-#include <vector>
-
 #include "bitboard.hpp"
+
+#include <vector>
 
 /**
  * Flips the board vertically such that row 1 becomes row 4, row 2 becomes row 3, and vice versa.
@@ -51,7 +51,7 @@ uint64_t bitboard::counterRotate(uint64_t board) {
 }
 
 std::vector<uint64_t> bitboard::allFlips(uint64_t board) {
-  std::vector<uint64_t> result {};
+  std::vector<uint64_t> result{};
   result.push_back(board);
   uint64_t transposition = bitboard::flipHorizontal(board);
   result.push_back(transposition);
