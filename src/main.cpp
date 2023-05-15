@@ -1,14 +1,17 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <random>
-#include <future>
-#include <array>
-#include <queue>
+#include <_types/_uint64_t.h>
 
-#include "hyperparameter.hpp"
+#include <array>
+#include <future>
+#include <iostream>
+#include <queue>
+#include <random>
+#include <unordered_map>
+#include <vector>
+
 #include "expectiminimax.hpp"
 #include "game.hpp"
+#include "hyperparameter.hpp"
+#include "moves.hpp"
 
 parameter::individual cross(const parameter::individual &i1, const parameter::individual &i2) {
   parameter::individual result;
@@ -25,13 +28,12 @@ void mutate(parameter::individual &i) {
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dis(0, 2);
 
-  std::array<float, 3> mutation {1, 0.80, 1.25};
+  std::array<float, 3> mutation{1, 0.80, 1.25};
 
   i.zero = i.zero * mutation[dis(gen)];
   i.merge = i.merge * mutation[dis(gen)];
   i.edge = i.edge * mutation[dis(gen)];
   i.mono = i.mono * mutation[dis(gen)];
-
 }
 
 void print_individual(parameter::individual const &i) {
@@ -51,17 +53,16 @@ void genetic() {
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0, 1000);
 
-  std::array<parameter::individual, 16> population {};
+  std::array<parameter::individual, 16> population{};
 
   for (auto i = 0; i < 16; i++) {
     population[i].mono = dis(gen);
     population[i].zero = dis(gen);
     population[i].edge = dis(gen);
     population[i].merge = dis(gen);
-
   }
 
-  auto cmp = [] (std::pair<float, parameter::individual> p1, std::pair<float, parameter::individual> p2) {
+  auto cmp = [](std::pair<float, parameter::individual> p1, std::pair<float, parameter::individual> p2) {
     return std::get<float>(p1) < std::get<float>(p2);
   };
 
@@ -74,13 +75,14 @@ void genetic() {
 
     std::priority_queue<std::pair<float, parameter::individual>,
                         std::vector<std::pair<float, parameter::individual> >,
-                        decltype(cmp)> pq(cmp);
+                        decltype(cmp)>
+        pq(cmp);
 
     for (auto i = 0; i < 16; i++) {
       pq.push(std::make_pair(results[i].get(), population[i]));
     }
 
-    std::array<parameter::individual, 4> top_4 {};
+    std::array<parameter::individual, 4> top_4{};
     population[0] = std::get<parameter::individual>(pq.top());
     std::cout << "Top Score: " << std::get<float>(pq.top()) << "\n";
     print_individual(population[0]);
@@ -122,9 +124,9 @@ void train_hypers() {
   float best_edge;
   float best_merge;
 
-  float result {0.f};
+  float result{0.f};
 
-  float best_result {0.f};
+  float best_result{0.f};
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -168,6 +170,49 @@ void train_hypers() {
   }
 }
 
+void play() {
+  uint64_t board{0};
+  board = game::populateBoard(game::populateBoard(board));
+  while (!game::gameOver(board)) {
+    std::cout << game::to_string(board) << "\n\n";
+    char move;
+    std::cin >> move;
+    uint64_t new_board;
+    switch (move) {
+      case 'w':
+        new_board = moves::moveUp(board);
+        break;
+
+      case 'a':
+        new_board = moves::moveLeft(board);
+        break;
+
+      case 's':
+        new_board = moves::moveDown(board);
+        break;
+
+      case 'd':
+        new_board = moves::moveRight(board);
+        break;
+
+      default:
+        break;
+    }
+
+    if (board != new_board) {
+      board = game::populateBoard(new_board);
+    }
+  }
+}
+
+void play_exp() {
+  uint64_t board {game::populateBoard(game::populateBoard(0))};
+  while (!game::gameOver(board)) {
+    board = game::populateBoard(moves::move(board, exp::bestMove(board)));
+    std::cout << game::to_string(board) << "\n\n";
+  }
+}
+
 int main() {
-  genetic();
+  play_exp();
 }
