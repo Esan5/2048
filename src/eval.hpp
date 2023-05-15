@@ -11,7 +11,7 @@ namespace eval {
   constexpr float MONOTONICITY_MULTIPLIER = 1416.48f;
   constexpr float ZEROS_MULTIPLIER = 468.643f;
   constexpr float SCORE_MULTIPLIER = 0.0f;
-  constexpr float MERGE_MULTIPLIER = 826.309f;
+  constexpr float MERGE_MULTIPLIER = 26.309f;
   constexpr float EDGE_MULTIPLIER = 2.97429f;
 }  // namespace eval
 
