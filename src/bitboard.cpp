@@ -50,6 +50,10 @@ uint64_t bitboard::counterRotate(uint64_t board) {
   return bitboard::flipVertical(bitboard::flipDiagonal(board));
 }
 
+/**
+ * Returns all possible rotations and mirrors of a board.
+ * This way the transposition table can be filled out for each board.
+ */
 std::vector<uint64_t> bitboard::allFlips(uint64_t board) {
   std::vector<uint64_t> result{};
   result.push_back(board);
@@ -57,8 +61,8 @@ std::vector<uint64_t> bitboard::allFlips(uint64_t board) {
   result.push_back(transposition);
   uint64_t diag_board = bitboard::flipDiagonal(board);
   uint64_t diag_trans = bitboard::flipDiagonal(transposition);
-  result.push_back(bitboard::flipDiagonal(board));
-  result.push_back(bitboard::flipDiagonal(transposition));
+  result.push_back(diag_board);
+  result.push_back(diag_trans);
   result.push_back(bitboard::flipVertical(board));
   result.push_back(bitboard::flipVertical(transposition));
   result.push_back(bitboard::flipHorizontal(diag_board));
