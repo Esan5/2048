@@ -3,7 +3,7 @@
 #include "moves.hpp"
 
 class MonteCarlo {
-  static constexpr uint16_t NUM_TRIALS = 500;
+  static constexpr uint16_t NUM_TRIALS = 250;
 
  public:
   static moves::type bestMove(uint64_t board);

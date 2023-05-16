@@ -9,13 +9,16 @@
 
 #include <iostream>
 
+/**
+ * Scores a state by continuously playing random games and taking the average of all game lengths.
+ */
 uint32_t MonteCarlo::scoreState(uint64_t board) {
   if (game::gameOver(board)) return 0;
 
   uint32_t score {0};
 
   for (uint16_t i = 0; i < MonteCarlo::NUM_TRIALS; i++) {
-    uint64_t trial = board;
+    uint64_t trial = game::populateBoard(board);
     while (!game::gameOver(trial)) {
       trial = game::populateBoard(MonteCarlo::randomMove(trial));
     }
@@ -28,6 +31,9 @@ uint32_t MonteCarlo::scoreState(uint64_t board) {
   return score;
 }
 
+/**
+ * Returns a random move of all legal moves.
+ */
 uint64_t MonteCarlo::randomMove(uint64_t board) {
   if (game::gameOver(board))
     return board;
@@ -56,6 +62,9 @@ uint64_t MonteCarlo::randomMove(uint64_t board) {
   return next_states[dist(gen)];
 }
 
+/**
+ * Scores all each move using MonteCarlo::scoreState function.
+ */
 moves::type MonteCarlo::bestMove(uint64_t board) {
   if (game::gameOver(board)) return moves::type::NONE;
 
@@ -69,6 +78,7 @@ moves::type MonteCarlo::bestMove(uint64_t board) {
   std::future<uint32_t> up_future;
   std::future<uint32_t> down_future;
 
+  // Multithread the exploration of each possible move.
   if (left ^ board)
     left_future = std::async(std::launch::async, MonteCarlo::scoreState, left);
   if (right ^ board)
@@ -97,8 +107,12 @@ moves::type MonteCarlo::bestMove(uint64_t board) {
   }
   if (down_score > best_score) {
     ret = moves::type::DOWN;
-    best_score = down_score;
   }
+
+  if (ret == moves::type::UP) std::cout << "Best Move: up" << "\n\n";
+  if (ret == moves::type::DOWN) std::cout << "Best Move: down" << "\n\n";
+  if (ret == moves::type::LEFT) std::cout << "Best Move: left" << "\n\n";
+  if (ret == moves::type::RIGHT) std::cout << "Best Move: right" << "\n\n";
 
   return ret;
 }

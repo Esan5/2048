@@ -8,7 +8,10 @@
 #include "game.hpp"
 #include "moves.hpp"
 
-// Calculates the best possible move for a given state.
+/** 
+ * Calculates the best possible move for a given state.
+ * This uses expectiminimax to find the expected value of each legal move.
+ */
 moves::type exp::bestMove(uint64_t board) {
   // If the game is over, no move can be made.
   if (game::gameOver(board))
@@ -34,6 +37,15 @@ moves::type exp::bestMove(uint64_t board) {
   // std::cout << "Right Score: " << right_score << "\n";
   // std::cout << "Down Score: " << down_score << "\n";
   // std::cout << "Up Score: " << up_score << "\n\n";
+
+  // On a rare occasion, all moves lead to a board that is lost.
+  // When this happens, just return any viable move.
+  if (left_score == 0 && right_score == 0 && up_score == 0 && down_score == 0) {
+      if (left ^ board) return moves::type::LEFT;
+      else if (right ^ board) return moves::type::RIGHT;
+      else if (up ^ board) return moves::type::UP;
+      else return moves::type::DOWN;
+  }
 
   // Determine the best possible move using the calculated scores.
   double best_score = up_score;

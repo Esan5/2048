@@ -4,7 +4,6 @@
 
 /**
  * Flips the board vertically such that row 1 becomes row 4, row 2 becomes row 3, and vice versa.
- * This takes eleven operations.
  */
 uint64_t bitboard::flipVertical(uint64_t board) {
   return ((board & bitboard::row_1) >> 48) |
@@ -15,7 +14,6 @@ uint64_t bitboard::flipVertical(uint64_t board) {
 
 /**
  * Flips the board horizontally such that column 1 becomes column 4, column 2 becomes column 3, and vice versa.
- * This takes eleven operations.
  */
 uint64_t bitboard::flipHorizontal(uint64_t board) {
   return ((board & bitboard::col_1) >> 12) |
@@ -26,7 +24,6 @@ uint64_t bitboard::flipHorizontal(uint64_t board) {
 
 /**
  * Flips the board across the diagonal defined by column index == row index.
- * This takes nineteen operations.
  */
 uint64_t bitboard::flipDiagonal(uint64_t board) {
   return ((board & 0x000000000000F000) << 36) |
@@ -40,12 +37,14 @@ uint64_t bitboard::flipDiagonal(uint64_t board) {
 
 /**
  * Rotates the board 90 degrees clockwise.
- * This takes 30 operations.
  */
 uint64_t bitboard::rotate(uint64_t board) {
   return bitboard::flipDiagonal(bitboard::flipVertical(board));
 }
 
+/**
+ * Rotates the board 90 degrees counterclockwise.
+ */
 uint64_t bitboard::counterRotate(uint64_t board) {
   return bitboard::flipVertical(bitboard::flipDiagonal(board));
 }
@@ -53,6 +52,9 @@ uint64_t bitboard::counterRotate(uint64_t board) {
 /**
  * Returns all possible rotations and mirrors of a board.
  * This way the transposition table can be filled out for each board.
+ *
+ * After later testing, I found that the bonus to cache hits for putting all possible orientations
+ * into the table was not worth the overhead of generating and storing all possible orientations.
  */
 std::vector<uint64_t> bitboard::allFlips(uint64_t board) {
   std::vector<uint64_t> result{};

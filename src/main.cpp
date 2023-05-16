@@ -1,17 +1,16 @@
 #include <_types/_uint64_t.h>
 
-#include <array>
-#include <future>
 #include <iostream>
-#include <queue>
-#include <random>
-#include <unordered_map>
-#include <vector>
 
 #include "expectiminimax.hpp"
 #include "game.hpp"
 #include "moves.hpp"
+#include "monte_carlo.hpp"
 
+/**
+ * Allows the user to play the game.
+ * Mainly for testing purposes.
+ */
 void play() {
   uint64_t board{0};
   board = game::populateBoard(game::populateBoard(board));
@@ -47,14 +46,31 @@ void play() {
   }
 }
 
+/**
+ * Plays the game using expectiminimax.
+ */
 void play_exp() {
-  uint64_t board {game::populateBoard(game::populateBoard(0))};
+  uint64_t board{game::populateBoard(game::populateBoard(0))};
   while (!game::gameOver(board)) {
     board = game::populateBoard(moves::move(board, exp::bestMove(board)));
     std::cout << game::to_string(board) << "\n\n";
   }
 }
 
+/**
+ * Plays the game using MonteCarlo search.
+ */
+void play_monte() {
+    uint64_t board {game::populateBoard(game::populateBoard(0))};
+
+    while (!game::gameOver(board)) {
+        board = game::populateBoard(moves::move(board, MonteCarlo::bestMove(board)));
+        std::cout << game::to_string(board) << "\n\n";
+    }
+}
+
 int main() {
-  play_exp();
+  // play_exp();
+  play_monte();
+  // play();
 }
